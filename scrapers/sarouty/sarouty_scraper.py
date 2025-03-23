@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from database.db_manager import  save_to_database_immo
 import re
 
-from scrapers.yakeey.listing_yakeey_scraper import get_listing_info
+from scrapers.sarouty.listing_sarouty_scraper import get_listing_info
 
 from utils.utils import Utils
 class SaroutyScraper(BaseScraper):
@@ -87,11 +87,17 @@ class SaroutyScraper(BaseScraper):
 
         for p in posts:
             title_tag = p.find("h2", class_="card-intro__title")
-            title = title_tag.text.strip()
 
 
        
             price_tag = p.find("p", class_="card-intro__price")
+            
+
+
+            if not title_tag or not price_tag:
+                    print("❌ Skipping post: Missing title or price")
+                    continue            
+            title = title_tag.text.strip()
             price = price_tag.text.strip()
             ville_tag = p.find("span", class_="card-specifications__location-text")
             items = p.find_all("p",{'class':'card-specifications__item'})
@@ -99,6 +105,7 @@ class SaroutyScraper(BaseScraper):
             surface_totale = get_item_text(items, 2)
             chambres = get_item_text(items, 1)
             salles_de_bains = get_item_text(items, 0)
+
             # time = time_tag.text.strip() if time_tag else "No Time"
             ville = ville_tag.text.strip() if ville_tag else "No Ville"
 
@@ -106,15 +113,14 @@ class SaroutyScraper(BaseScraper):
 
 
             categ = get_listing_info(f"{baseUrl}{listing_url}")
-
+            print("-----------------")
+            print(categ)
+            print("-----------------")
             
 
 
-            price_en_m2 = None
-            if(isinstance(Utils.get_numeric_value(price),numbers.Number)):
-                print(Utils.get_numeric_value(price))
-                price_en_m2=Utils.get_numeric_value(price)/Utils.get_numeric_value(surface_totale)
-            print(price_en_m2)
+            price_en_m2 = Utils.safe_division(price, surface_totale)
+    
 
 
             print(f"Title: {title}, Price: {price}, Ville: {ville}, URL: {baseUrl}{listing_url}")
@@ -126,16 +132,17 @@ class SaroutyScraper(BaseScraper):
                 titre=title,
                 prix=Utils.get_numeric_value(price),
                 url=baseUrl+listing_url,
+                images_urls=categ["images"],
                 ville=ville,
                 surface_totale_m2=Utils.get_numeric_value(surface_totale),
                 chambres=chambres,
                 salles_de_bains=salles_de_bains,
                 prix_en_m2=price_en_m2,
                 # date_d_achevement=completion_date,
-                # developer=developer,
-                # contact_phone=contact_phone,
-                # longitude=details.get("Longitude", None),   # Add longitude
-                # latitude=details.get("Latitude", None),  
+                developer=categ["developer"],
+                contact_phone=categ["phone"],
+                longitude=categ["latitude"],   # Add longitude
+                latitude=categ["longitude"],  
                 source="sarouty"
             )
 

@@ -6,8 +6,8 @@ if __name__ == "__main__":
     scrapers = [
         # AvitoScraper(),
         # AvitoImmoScraper(),
-        # YakeeyScraper()
-        SaroutyScraper()
+          YakeeyScraper()
+        #  SaroutyScraper()
         # Add more scrapers here later
     ]
 

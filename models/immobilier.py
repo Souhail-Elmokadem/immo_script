@@ -5,6 +5,7 @@ class Immobilier:
     titre: str
     prix: str
     url: str
+    images_urls:str = None
     latitude: float = None
     longitude: float = None
     balcon: bool = None

@@ -2,6 +2,8 @@
 from abc import ABC, abstractmethod
 from selenium import webdriver
 from bs4 import BeautifulSoup
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class BaseScraper(ABC):
     def __init__(self, base_url,params):
@@ -17,6 +19,12 @@ class BaseScraper(ABC):
     def fetch_page(self, url):
         """Fetch page source using Selenium"""
         self.driver.get(url)
+        try:
+            WebDriverWait(self.driver, 20).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+        except Exception:
+            print(f"⚠️ Warning: Page load timeout on {url}")
         return self.driver.page_source
 
     def scrape(self, max_pages=100):

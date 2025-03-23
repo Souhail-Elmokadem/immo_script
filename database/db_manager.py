@@ -27,14 +27,14 @@ def save_to_database_immo(immobilier):
         cursor = conn.cursor()
 
         query = """
-        INSERT INTO immobilier (titre, prix, url, latitude, longitude, balcon, concierge, ville, 
+        INSERT INTO immobilier (titre, prix, url,images_urls, latitude, longitude, balcon, concierge, ville, 
                               surface_totale_m2, salles_de_bains, chambres, source, prix_en_m2,
                               date_d_achevement, developer, contact_phone)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """
 
         cursor.execute(query, (
-            immobilier.titre, immobilier.prix, immobilier.url, immobilier.latitude, immobilier.longitude,
+            immobilier.titre, immobilier.prix, immobilier.url,immobilier.images_urls, immobilier.latitude, immobilier.longitude,
             immobilier.balcon, immobilier.concierge, immobilier.ville, immobilier.surface_totale_m2,
             immobilier.salles_de_bains, immobilier.chambres, immobilier.source, immobilier.prix_en_m2,
             immobilier.date_d_achevement, immobilier.developer, immobilier.contact_phone

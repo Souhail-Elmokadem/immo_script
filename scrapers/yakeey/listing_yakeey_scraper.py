@@ -1,39 +1,53 @@
 import requests
-import json
 from bs4 import BeautifulSoup
 import re
+import json
 
-def get_listing_info(url):
-    """
-    Extract listing details from the webpage, find `userRef`, and fetch latitude & longitude from API.
-    """
+def fetch_page(url):
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.google.com",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "Accept-Language": "en-US,en;q=0.9",
     }
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.text
+
+
+def extract_json_from_script(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    scripts = soup.find_all("script")
+
+    for script in scripts:
+        if script.string and 'window.propertyfinder.settings.moreProperties' in script.string:
+            json_text_match = re.search(
+                r'window\.propertyfinder\.settings\.moreProperties\s*=\s*(\{.*?\});',
+                script.string,
+                re.DOTALL
+            )
+            if json_text_match:
+                json_text = json_text_match.group(1)
+                try:
+                    data = json.loads(json_text)
+                    return data
+                except json.JSONDecodeError as e:
+                    print(f"JSON decoding failed: {e}")
+                    return None
+    return None
+
+
+def get_phone_number(json_data):
     try:
-        
-        cleaned_url = re.sub(r"https://www\.sarouty\.mahttps:", "https:", url)
-        print(cleaned_url)
-        response = requests.get(cleaned_url,headers=headers)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        images = []
-        for img in soup.find_all('img'):
-            src = img.get('src')
-            if src:
-                if "/property/" in src: 
-                    images.append(src)
-        print(images)
-        imgesString = ""
-        for i in images:
-            imgesString = imgesString+","+i
-        return imgesString
-
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Error fetching listing page: {e}")
-        return None, None
+        phone_number = json_data['payload']['data'][0]['meta']['contact_options']['details']['phone']['value']
+        return phone_number
+    except (KeyError, TypeError, IndexError) as e:
+        print(f"Error extracting phone number: {e}")
+        return None
 
 
-
+def extract_phone_from_url(url):
+    html = fetch_page(url)
+    json_data = extract_json_from_script(html)
+    if json_data:
+        phone = get_phone_number(json_data)
+        return phone
+    return None

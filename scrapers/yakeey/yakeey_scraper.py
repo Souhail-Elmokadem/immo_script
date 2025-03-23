@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from database.db_manager import  save_to_database_immo
 import re
 
-from scrapers.yakeey.listing_yakeey_scraper import get_listing_info
+from scrapers.yakeey.listing_yakeey_scraper import extract_phone_from_url
 
 from utils.utils import Utils
 class YakeeyScraper(BaseScraper):
@@ -132,17 +132,15 @@ class YakeeyScraper(BaseScraper):
             ville = ville_tag.text.strip() if ville_tag else "No Ville"
             listing_url = p.find("a",{'class':'MuiBox-root mui-1y4n71p'})["href"] if p.find("a") else "No URL Found"
 
-
-            categ = get_listing_info(f"{listing_url}")
-
-            
+            print("+++++++++++++2+++++++++++++")
+            categ = extract_phone_from_url(f"{baseUrl}{listing_url}")
+            print("+++++++++++++2+++++++++++++")
+            print(categ)
 
 
             price_en_m2 = None
-            if(isinstance(Utils.get_numeric_value(price),numbers.Number)):
-                print(Utils.get_numeric_value(price))
-                price_en_m2=Utils.get_numeric_value(price)/Utils.get_numeric_value(surface)
-            print(price_en_m2)
+            if price and surface:
+                price_en_m2 = Utils.safe_division(price, surface)
 
 
             print(f"Title: {title}, Price: {price}, Ville: {ville}, URL: {listing_url}")
@@ -155,6 +153,7 @@ class YakeeyScraper(BaseScraper):
                 prix=Utils.get_numeric_value(price),
                 url=baseUrl+listing_url,
                 ville=ville,
+                balcon=1 if "Ascenseur" in categ else 0,
                 surface_totale_m2=surface,
                 chambres=chambres,
                 salles_de_bains=salles_de_bains,
@@ -167,7 +166,7 @@ class YakeeyScraper(BaseScraper):
                 source="Yakeey"
             )
 
-            # Save to the database
+           
             save_to_database_immo(immobilier)
             
 
