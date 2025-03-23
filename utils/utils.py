@@ -1,9 +1,12 @@
 import re
 
 class Utils:
+    @staticmethod
     def get_numeric_value(text):
+        if isinstance(text, (int, float)):
+            return text
         if not text:
-            return 0  # or None
+            return 0
         numbers = re.sub(r"[^\d]", "", text)
         return int(numbers) if numbers else 0
  
