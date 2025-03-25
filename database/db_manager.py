@@ -3,19 +3,56 @@ import pymysql
 from config import DB_CONFIG
 from models.immobilier import Immobilier
 
-def save_to_database(title, time, price, url):
-    """Saves scraped data to the database"""
+def create_database_if_not_exists(db_name):
+    try:
+        # Connect to MySQL without selecting a database
+        conn = pymysql.connect(host="localhost", user="root", password="")
+        cursor = conn.cursor()
+
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name}")
+        print(f"✅ Database '{db_name}' is ready.")
+        
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        print(f"❌ Error creating database: {e}")
+
+
+def create_immobilier_table():
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO listings (title, time, price, url) VALUES (%s, %s, %s, %s)", 
-                       (title, time, price, url))
+
+        query = """
+        CREATE TABLE IF NOT EXISTS immobilier (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            titre TEXT,
+            prix TEXT,
+            url TEXT,
+            images_urls TEXT,
+            latitude VARCHAR(50),
+            longitude VARCHAR(50),
+            balcon BOOLEAN,
+            concierge BOOLEAN,
+            ville TEXT,
+            surface_totale_m2 VARCHAR(50),
+            salles_de_bains VARCHAR(50),
+            chambres VARCHAR(50),
+            source TEXT,
+            prix_en_m2 VARCHAR(50),
+            date_d_achevement TEXT,
+            developer TEXT,
+            contact_phone TEXT
+        )
+        """
+        cursor.execute(query)
         conn.commit()
         cursor.close()
         conn.close()
-        print(f"✅ Saved: {title} - {price}")
+        print("✅ Table 'immobilier' is ready.")
     except Exception as e:
-        print(f"❌ Database Error: {e}")
+        print(f"❌ Error creating table: {e}")
 
 
 

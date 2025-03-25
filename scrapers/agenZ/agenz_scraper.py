@@ -1,7 +1,7 @@
 # scrapers/yakeey_scraper.py
 import numbers
 from models.immobilier import Immobilier
-from ..base_scraper import BaseScraper
+from ..standard_base.base_standard import BaseScraper
 from bs4 import BeautifulSoup
 from database.db_manager import save_to_database_immo
 import re
@@ -12,19 +12,20 @@ import time
 from selenium.webdriver.common.by import By
 from utils.utils import Utils
 import json
-class MubawabScraper(BaseScraper):
+class AgenZScraper(BaseScraper):
     def __init__(self):
-        super().__init__("https://www.mubawab.ma/fr/sc/appartements-a-vendre", "page")
+        super().__init__("https://agenz.ma/en/acheter", "page")
 
 
     # redifintion de la methode fetch_page
     def fetch_page(self, url):
+        base_url = "https://agenz.ma"
         """Override to handle lazy loading for Mubawab"""
         self.driver.get(url)
 
         try:
             WebDriverWait(self.driver, 20).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "listingBox"))
+                EC.presence_of_element_located((By.CLASS_NAME, "_listingCard_1k4wq_1"))
             )
 
             # Scroll multiple times to load more results
@@ -39,35 +40,68 @@ class MubawabScraper(BaseScraper):
         return self.driver.page_source
 
     def parse_page(self, html):
+        base_url = "https://agenz.ma"
+        def extract_full_location(line):
+                    if "-" in line:
+                        return line.split("-")[-1].strip()
+                    return None
+        
         soup = BeautifulSoup(html, "html.parser")
-        posts = soup.find_all("div", class_="listingBox")
-        print(f"🔍 Found {len(posts)} listings on this page")
-
-
+        print("++++++++++1+++++++++++++")
+        posts = soup.find_all("div", class_="_listingCard_1k4wq_1")
         for p in posts:
             try:
-                title_tag = p.find("h2", class_="listingTit col-11")
-                title = title_tag.text.strip() if title_tag else "No Title"
-
-                infos = p.find_all("div", {'class': 'adDetailFeature'})
+                title_tag = p.find("a", class_="_locationAdress_1qcbr_192")
+                title = title_tag['title'] if title_tag else "No Title"
+                
+                # infos = p.find_all("div", {'class': 'adDetailFeature'})
                 
                 
+                
+                image_blocks = p.find_all("div", {'class': '_imageItem_xtk0p_35'})
 
-                imageList  = p.find_all("img", {'class': 'sliderImage'})
-                image_urls = [img.get("src") for img in imageList if img.get("src")]
-                imagesString = (",").join(image_urls)
+                # If <img> tags are inside those divs
+                image_urls = []
+
+                for div in image_blocks:
+                    img = div.find("img")  # Or another tag inside
+                    if img and img.get("src"):
+                        imagtemp = base_url+img.get("src")
+                        image_urls.append(imagtemp)
+
+                imagesString = ",".join(image_urls)
+
 
                 print("++++++++++1+++++++++++++")
-                surface = infos[0].text.strip() if len(infos) > 0 else "No Title"
-                chambres = infos[2].text.strip() if len(infos) > 1 else "No Title"
-                salles_de_bains = infos[3].text.strip() if len(infos) > 2 else "No Title"
+                rooms_info = p.find_all("div", class_="_rooms_1qcbr_139")
 
+                surface = chambres = salles_de_bains = None
+
+                for block in rooms_info:
+                    value_tag = block.find("div", class_="_nouveau_1qcbr_60")
+                    label_tag = block.find("div", class_="_typeBien_1qcbr_148")
+
+                    if not value_tag or not label_tag:
+                        continue
+
+                    value = value_tag.text.strip()
+                    label = label_tag.text.strip().lower()
+
+                    if "bedroom" in label:
+                        chambres = value
+                    elif "bathroom" in label:
+                        salles_de_bains = value
+                    elif "sqm" in label:
+                        surface = value
+
+                
                 print("++++++++++2+++++++++++++")
-
-                ville_tag = p.find("span", class_="listingH3")
-                ville = ville_tag.text.strip() if ville_tag else "No Ville"
+               
+                
+                ville = extract_full_location(title)
+                
                 print("++++++++++3+++++++++++++")
-                price = p.find("span", class_="priceTag hardShadow float-left")
+                price = p.find("span", class_="_nouveau_1qcbr_60")
                 price = price.text.strip() if price else "No Price"
                 print("++++++++++4+++++++++++++")
                 listing_url_tag = p.find("a")
@@ -78,7 +112,7 @@ class MubawabScraper(BaseScraper):
 
                 print("++++++++++5+++++++++++++")
 
-                complete_url = f"{listing_url}"
+                complete_url = f"{base_url}{listing_url}"
                 price_numeric = Utils.get_numeric_value(price)
 
                 
@@ -97,7 +131,7 @@ class MubawabScraper(BaseScraper):
                     ville=ville,
                     balcon=1,
                     surface_totale_m2=Utils.get_numeric_value(surface),
-                    prix_en_m2=price_en_m2,
+                     prix_en_m2=price_en_m2,
                     chambres=Utils.get_numeric_value(chambres),
                     longitude=long if long else 0,
                     latitude=lat if lat else 0,
@@ -105,7 +139,7 @@ class MubawabScraper(BaseScraper):
                     salles_de_bains=Utils.get_numeric_value(salles_de_bains),
                     concierge=1,
                     # developer="",
-                    source="Yakeey"
+                    source="Agenz"
                 )
 
                 print(f"✅ Data Parsed: {title} - {price}")
@@ -117,3 +151,5 @@ class MubawabScraper(BaseScraper):
             except Exception as e:
                 print(f"❌ Error parsing data: {e}, skipping...")
                 continue
+
+

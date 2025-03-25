@@ -1,5 +1,5 @@
 import re
-
+import requests
 class Utils:
     @staticmethod
     def get_numeric_value(text):
@@ -18,3 +18,13 @@ class Utils:
             return num / den if den else None
         except Exception:
             return None
+    def geocode_address(address):
+        url = f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
+        try:
+            response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            data = response.json()
+            if data:
+                return float(data[0]['lat']), float(data[0]['lon'])
+        except Exception as e:
+            print(f"❌ Geocoding failed: {e}")
+        return None, None

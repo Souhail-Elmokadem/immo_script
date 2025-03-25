@@ -2,7 +2,7 @@
 # scrapers/avito_scraper.py
 import numbers
 from models.immobilier import Immobilier
-from ..base_scraper import BaseScraper
+from ..standard_base.base_standard import BaseScraper
 from bs4 import BeautifulSoup
 from database.db_manager import  save_to_database_immo
 import re
