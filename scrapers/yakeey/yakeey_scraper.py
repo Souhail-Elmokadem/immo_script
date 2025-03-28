@@ -52,7 +52,6 @@ class YakeeyScraper(BaseScraper):
                 imagesString = ""
                 for img in imageList:
                     imagesString += reformat_yakeey_url(img['src']) + ","
-                    print(f"🖼️ Image: {reformat_yakeey_url(img['src'])}")
 
                 surface, chambres, salles_de_bains = extract_property_info(otherinfos)
 
@@ -70,7 +69,6 @@ class YakeeyScraper(BaseScraper):
                 if listing_url_tag and "href" in listing_url_tag.attrs:
                     listing_url = listing_url_tag["href"]
                 else:
-                    print("⚠️ Listing URL not found, skipping...")
                     continue
 
                 complete_url = f"{baseUrl}{listing_url}"
@@ -106,7 +104,6 @@ class YakeeyScraper(BaseScraper):
                     source="Yakeey"
                 )
 
-                print(f"✅ Data Parsed: {title} - {price}")
                 save_to_database_immo(immobilier)
 
             except Exception as e:

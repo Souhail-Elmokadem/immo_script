@@ -18,6 +18,8 @@ def create_database_if_not_exists(db_name):
     except Exception as e:
         print(f"❌ Error creating database: {e}")
 
+def get_connection():
+        return pymysql.connect(**DB_CONFIG)
 
 def create_immobilier_table():
     try:
@@ -85,3 +87,4 @@ def save_to_database_immo(immobilier):
 
     except Exception as e:
         print(f"❌ Database Error: {e}")
+

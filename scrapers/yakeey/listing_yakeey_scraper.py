@@ -32,7 +32,6 @@ def extract_phone_number(page_source):
     phone = None
     for script in scripts:
         if script.string and 'phoneNumber' in script.string:
-            print("✅ Found script containing phone number")
             
             # Now html.unescape works fine
             clean_script = html.unescape(script.string).replace("\\", "")
@@ -51,7 +50,7 @@ def extract_phone_number(page_source):
 def geocode_address(address):
     url = f"https://nominatim.openstreetmap.org/search?format=json&q={address}"
     try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"},timeout=10)
         data = response.json()
         if data:
             return float(data[0]['lat']), float(data[0]['lon'])

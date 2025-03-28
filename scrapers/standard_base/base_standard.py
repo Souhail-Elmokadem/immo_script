@@ -20,7 +20,7 @@ class BaseScraper(ABC):
 
     def scrape(self, max_pages=100):
         """Main scraping loop"""
-        for page in range(1, max_pages + 1):
+        for page in range(11, max_pages + 1):
             url = f"{self.base_url}?{self.params}={page}"
             print(f"Scraping {url}...")
             html = self.fetch_page(url)

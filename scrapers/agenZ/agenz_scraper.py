@@ -47,7 +47,7 @@ class AgenZScraper(BaseScraper):
                     return None
         
         soup = BeautifulSoup(html, "html.parser")
-        print("++++++++++1+++++++++++++")
+        
         posts = soup.find_all("div", class_="_listingCard_1k4wq_1")
         for p in posts:
             try:
@@ -72,7 +72,6 @@ class AgenZScraper(BaseScraper):
                 imagesString = ",".join(image_urls)
 
 
-                print("++++++++++1+++++++++++++")
                 rooms_info = p.find_all("div", class_="_rooms_1qcbr_139")
 
                 surface = chambres = salles_de_bains = None
@@ -95,22 +94,18 @@ class AgenZScraper(BaseScraper):
                         surface = value
 
                 
-                print("++++++++++2+++++++++++++")
                
                 
                 ville = extract_full_location(title)
                 
-                print("++++++++++3+++++++++++++")
                 price = p.find("span", class_="_nouveau_1qcbr_60")
                 price = price.text.strip() if price else "No Price"
-                print("++++++++++4+++++++++++++")
                 listing_url_tag = p.find("a")
                 if listing_url_tag and listing_url_tag.has_attr('href'):
                     listing_url = listing_url_tag.get("href")
                 else:
                     listing_url = "No URL"
 
-                print("++++++++++5+++++++++++++")
 
                 complete_url = f"{base_url}{listing_url}"
                 price_numeric = Utils.get_numeric_value(price)
@@ -119,7 +114,6 @@ class AgenZScraper(BaseScraper):
                 price_en_m2 = Utils.safe_division(price, surface)
                 
                 long,lat = Utils.geocode_address(ville)
-                print("++++++++++6+++++++++++++")
 
 
 
@@ -142,9 +136,7 @@ class AgenZScraper(BaseScraper):
                     source="Agenz"
                 )
 
-                print(f"✅ Data Parsed: {title} - {price}")
                 if title == "No Title" or price_numeric == 0:
-                    print("❌ Skipping invalid data...")
                     continue
                 save_to_database_immo(immobilier)
 

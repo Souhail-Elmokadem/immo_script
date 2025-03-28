@@ -1,7 +1,7 @@
 # scrapers/yakeey_scraper.py
 import numbers
 from models.immobilier import Immobilier
-from ..base_scraper import BaseScraper
+from ..standard_base.base_standard import BaseScraper
 from bs4 import BeautifulSoup
 from database.db_manager import save_to_database_immo
 import re
@@ -41,9 +41,6 @@ class MubawabScraper(BaseScraper):
     def parse_page(self, html):
         soup = BeautifulSoup(html, "html.parser")
         posts = soup.find_all("div", class_="listingBox")
-        print(f"🔍 Found {len(posts)} listings on this page")
-
-
         for p in posts:
             try:
                 title_tag = p.find("h2", class_="listingTit col-11")
@@ -57,26 +54,26 @@ class MubawabScraper(BaseScraper):
                 image_urls = [img.get("src") for img in imageList if img.get("src")]
                 imagesString = (",").join(image_urls)
 
-                print("++++++++++1+++++++++++++")
+                
                 surface = infos[0].text.strip() if len(infos) > 0 else "No Title"
                 chambres = infos[2].text.strip() if len(infos) > 1 else "No Title"
                 salles_de_bains = infos[3].text.strip() if len(infos) > 2 else "No Title"
 
-                print("++++++++++2+++++++++++++")
+                
 
                 ville_tag = p.find("span", class_="listingH3")
                 ville = ville_tag.text.strip() if ville_tag else "No Ville"
-                print("++++++++++3+++++++++++++")
+                
                 price = p.find("span", class_="priceTag hardShadow float-left")
                 price = price.text.strip() if price else "No Price"
-                print("++++++++++4+++++++++++++")
+                
                 listing_url_tag = p.find("a")
                 if listing_url_tag and listing_url_tag.has_attr('href'):
                     listing_url = listing_url_tag.get("href")
                 else:
                     listing_url = "No URL"
 
-                print("++++++++++5+++++++++++++")
+               
 
                 complete_url = f"{listing_url}"
                 price_numeric = Utils.get_numeric_value(price)
@@ -85,7 +82,7 @@ class MubawabScraper(BaseScraper):
                 price_en_m2 = Utils.safe_division(price, surface)
                 
                 long,lat = Utils.geocode_address(ville)
-                print("++++++++++6+++++++++++++")
+               
 
 
 
@@ -105,12 +102,10 @@ class MubawabScraper(BaseScraper):
                     salles_de_bains=Utils.get_numeric_value(salles_de_bains),
                     concierge=1,
                     # developer="",
-                    source="Yakeey"
+                    source="mubawab"
                 )
 
-                print(f"✅ Data Parsed: {title} - {price}")
                 if title == "No Title" or price_numeric == 0:
-                    print("❌ Skipping invalid data...")
                     continue
                 save_to_database_immo(immobilier)
 

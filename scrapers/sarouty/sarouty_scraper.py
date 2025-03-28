@@ -13,6 +13,29 @@ from utils.utils import Utils
 class SaroutyScraper(BaseScraper):
     def __init__(self):
         super().__init__("https://www.sarouty.ma/fr/recherche","page")
+    def scrape(self, max_pages=100):
+        try:
+            for page in range(11, max_pages + 1):
+                url = f"{self.base_url}?{self.params}={page}"
+                print(f"Scraping {url}...")
+                html = self.fetch_page(url)
+
+                if not html:
+                    print("❌ Page non chargée, arrêt.")
+                    break
+
+                soup = BeautifulSoup(html, "html.parser")
+                
+                listings = soup.find_all("div", class_="card-list__item")
+
+                if not listings:
+                    print(f"🚫 Plus de résultats à la page {page}.")
+                    break
+
+                self.parse_page(html)
+        finally:
+            print("🧹 Quitting WebDriver...")
+            self.driver.quit()
 
     def parse_page(self, html):
         baseUrl = "https://www.sarouty.ma"
@@ -94,8 +117,7 @@ class SaroutyScraper(BaseScraper):
             
 
 
-            if not title_tag or not price_tag:
-                    print("❌ Skipping post: Missing title or price")
+            if not title_tag:
                     continue            
             title = title_tag.text.strip()
             price = price_tag.text.strip()
@@ -113,20 +135,17 @@ class SaroutyScraper(BaseScraper):
 
 
             categ = get_listing_info(f"{baseUrl}{listing_url}")
-            print("-----------------")
-            print(categ)
-            print("-----------------")
-            
+           
 
 
             price_en_m2 = Utils.safe_division(price, surface_totale)
     
 
 
-            print(f"Title: {title}, Price: {price}, Ville: {ville}, URL: {baseUrl}{listing_url}")
-            # completion_date = details.get("Completion Date", "N/A")
-            # developer = details.get("Developer", "N/A")
-            # contact_phone = details.get("Contact Phone", "N/A")
+            # print(f"Title: {title}, Price: {price}, Ville: {ville}, URL: {baseUrl}{listing_url}")
+            # # completion_date = details.get("Completion Date", "N/A")
+            # # developer = details.get("Developer", "N/A")
+            # # contact_phone = details.get("Contact Phone", "N/A")
 
             immobilier = Immobilier(
                 titre=title,

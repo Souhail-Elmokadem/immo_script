@@ -1,7 +1,7 @@
 # scrapers/base_scraper.py
 from abc import ABC, abstractmethod
 from selenium import webdriver
-from bs4 import BeautifulSoup
+
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
@@ -44,6 +44,7 @@ class BaseScraper(ABC):
                 print(f"Scraping {url}...")
                 html = self.fetch_page(url)
                 self.parse_page(html)
+
         finally:
             print("🧹 Quitting WebDriver...")
             self.driver.quit()

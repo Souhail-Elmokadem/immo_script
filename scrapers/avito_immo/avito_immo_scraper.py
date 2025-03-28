@@ -16,13 +16,17 @@ class AvitoImmoScraper(BaseScraper):
     def parse_page(self, html):
         baseUrl = "https://immoneuf.avito.ma"
 
-        """Parse Avito page and extract data"""
+
         soup = BeautifulSoup(html, "html.parser")
         posts = soup.find_all("a", class_="sc-1jge648-0 jZXrfL")
 
+        if not posts:
+            return False  # plus rien à scraper
+    
         def get_item_text( items, index):
             """Safely extract text from items list."""
             return items[index].contents[1].text.strip() if len(items) > index else None
+        
 
 
         for p in posts:
@@ -39,15 +43,9 @@ class AvitoImmoScraper(BaseScraper):
 
             details = get_listing_info(f"https://immoneuf.avito.ma{listing_url}")
             if details is None:
-                        print(f"❌ Failed to extract details for: {title} ({listing_url})")
                         continue  # Skip this entry and proceed with the next
 
-            print("-+-----------------")
-            if details:
-                print("\n✅ Extracted Project Info:")
-                for key, value in details.items():
-                    print(f"{key}: {value}")
-            print("-+-----------------")
+          
 
        
             
@@ -59,12 +57,9 @@ class AvitoImmoScraper(BaseScraper):
 
             price_en_m2 = None
             if(isinstance(Utils.get_numeric_value(price),numbers.Number)):
-                print(Utils.get_numeric_value(price))
                 price_en_m2=Utils.get_numeric_value(price)/Utils.get_numeric_value(surface_totale)
-            print(price_en_m2)
 
 
-            print(f"Title: {title}, Price: {price}, Time: {time}, URL: {listing_url}")
             completion_date = details.get("Completion Date", "N/A")
             developer = details.get("Developer", "N/A")
             contact_phone = details.get("Contact Phone", "N/A")

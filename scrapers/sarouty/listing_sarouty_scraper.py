@@ -12,7 +12,6 @@ def get_listing_info(url):
     try:
         # Fix malformed URL if needed
         cleaned_url = re.sub(r"https://www\.sarouty\.mahttps:", "https:", url)
-        print(f"🔗 Fetching: {cleaned_url}")
 
         response = requests.get(cleaned_url, headers=headers)
         response.raise_for_status()
