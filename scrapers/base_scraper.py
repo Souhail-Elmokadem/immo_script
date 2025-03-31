@@ -36,10 +36,10 @@ class BaseScraper(ABC):
             return None  # Don't quit here, let it be handled in scrape loop
 
 
-    def scrape(self, max_pages=100):
+    def scrape(self, max_pages=3):
         """Main scraping loop"""
         try:
-            for page in range(1, max_pages + 1):
+            for page in range(1, max_pages ):
                 url = f"{self.base_url}?{self.params}={page}"
                 print(f"Scraping {url}...")
                 html = self.fetch_page(url)

@@ -13,9 +13,9 @@ from utils.utils import Utils
 class SaroutyScraper(BaseScraper):
     def __init__(self):
         super().__init__("https://www.sarouty.ma/fr/recherche","page")
-    def scrape(self, max_pages=100):
+    def scrape(self, max_pages=3):
         try:
-            for page in range(11, max_pages + 1):
+            for page in range(11, max_pages ):
                 url = f"{self.base_url}?{self.params}={page}"
                 print(f"Scraping {url}...")
                 html = self.fetch_page(url)

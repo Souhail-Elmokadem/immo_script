@@ -30,7 +30,7 @@ def start_scraper(name: str):
     return {"message": f"{name} lancé ✅"}
 
 @app.post("/start-all")
-def start_all():
+def start_all_sequential():
     launched = []
     skipped = []
 
@@ -39,16 +39,21 @@ def start_all():
             skipped.append(name)
             continue
 
-        t = Thread(target=run_scraper, args=(name,))
-        threads[name] = t
-        t.start()
-        launched.append(name)
+        # Exécution directe sans thread (bloquant)
+        scraper_status[name] = "⏳ En cours..."
+        try:
+            run_scraper(name)
+            scraper_status[name] = "✅ Terminé"
+            launched.append(name)
+        except Exception as e:
+            scraper_status[name] = f"❌ Échec: {str(e)}"
 
     return {
         "launched": launched,
         "skipped": skipped,
-        "message": f"{len(launched)} scrapers lancés, {len(skipped)} déjà en cours."
+        "message": f"{len(launched)} scrapers exécutés séquentiellement, {len(skipped)} ignorés car déjà en cours."
     }
+
 
 @app.get("/status")
 def get_status():
