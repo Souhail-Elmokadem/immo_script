@@ -1,24 +1,29 @@
 import logo from './logo.svg';
 import './App.css';
+import Navbar from './componants/navbar/Navbar';
+import Sidebar from './componants/sidebar/sidebar';
+import Home from './pages/home/home';
+import Layout from './pages/Layout';
+import { BrowserRouter,Routes,Route } from 'react-router-dom';
+import Scrape from './pages/scrape/Scrape';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+   
+
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />} >
+          <Route index element={<Home />} />
+          <Route path="scrape" element={<Scrape />} />
+        
+        </Route>
+       
+      </Routes>
+    </BrowserRouter>
+     
+    
+   
   );
 }
 
