@@ -27,10 +27,20 @@ class MubawabScraper(BaseScraper):
                 EC.presence_of_element_located((By.CLASS_NAME, "listingBox"))
             )
 
-            # Scroll multiple times to load more results
-            for _ in range(3):
+            # ✅ 🔁 Nouveau scroll dynamique jusqu’à ce qu’il n’y ait plus rien à charger
+            previous_height = 0
+            scroll_retries = 0
+
+            while scroll_retries < 5:
                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
+                time.sleep(3)
+                current_height = self.driver.execute_script("return document.body.scrollHeight")
+
+                if current_height == previous_height:
+                    scroll_retries += 1
+                else:
+                    scroll_retries = 0
+                    previous_height = current_height
 
         except Exception as e:
             print(f"⚠️ Timeout or error on {url}: {e}")
@@ -38,9 +48,12 @@ class MubawabScraper(BaseScraper):
 
         return self.driver.page_source
 
+
     def parse_page(self, html):
         soup = BeautifulSoup(html, "html.parser")
         posts = soup.find_all("div", class_="listingBox")
+      
+
         for p in posts:
             try:
                 title_tag = p.find("h2", class_="listingTit col-11")
