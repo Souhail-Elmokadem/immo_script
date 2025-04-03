@@ -4,6 +4,7 @@ from scrapers.mubawab.mubawab_scraper import MubawabScraper
 from scrapers.yakeey.yakeey_scraper import YakeeyScraper
 from scrapers.sarouty.sarouty_scraper import SaroutyScraper
 from scrapers.agenZ.agenz_scraper import AgenZScraper
+from scrapers.mubawab.mubawab_scraper_location import MubawabLocationScraper
 from database.db_manager import create_database_if_not_exists, create_immobilier_table
 from config import DB_CONFIG
 
@@ -36,9 +37,10 @@ if __name__ == "__main__":
 
     scrapers = [
         # AvitoImmoScraper(),
-        #  MubawabScraper(),
+           MubawabScraper(),
+        # MubawabLocationScraper()
         # YakeeyScraper(),
-         SaroutyScraper()
+        #  SaroutyScraper()
         # AgenZScraper()
     ]
 

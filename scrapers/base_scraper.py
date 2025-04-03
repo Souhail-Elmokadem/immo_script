@@ -36,16 +36,23 @@ class BaseScraper(ABC):
             return None  # Don't quit here, let it be handled in scrape loop
 
 
-    def scrape(self, max_pages=3):
-        """Main scraping loop"""
-        try:
-            for page in range(1, max_pages ):
+def scrape(self, max_pages=100):
+    """Main scraping loop compatible with `?page=` or `:p:{}` style pagination."""
+    try:
+        for page in range(1, max_pages + 1):
+            # Génère l’URL dynamiquement en fonction de la présence de {} dans base_url
+            if "{}" in self.base_url:
+                url = self.base_url.format(page)
+            else:
                 url = f"{self.base_url}?{self.params}={page}"
-                print(f"Scraping {url}...")
-                html = self.fetch_page(url)
-                self.parse_page(html)
 
-        finally:
-            print("🧹 Quitting WebDriver...")
-            self.driver.quit()
+            print(f"Scraping {url}...")
+            html = self.fetch_page(url)
+            if not html:
+                break
+            self.parse_page(html)
+    finally:
+        print("🧹 Quitting WebDriver...")
+        self.driver.quit()
+
 

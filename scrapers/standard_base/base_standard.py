@@ -18,7 +18,7 @@ class BaseScraper(ABC):
         self.driver.get(url)
         return self.driver.page_source
 
-    def scrape(self, max_pages=30):
+    def scrape(self, max_pages=100):
         """Main scraping loop"""
         for page in range(1, max_pages ):
             url = f"{self.base_url}?{self.params}={page}"

@@ -1,22 +1,22 @@
 # scrapers/yakeey_scraper.py
 import numbers
 from models.immobilier import Immobilier
-from ..base_scraper import BaseScraper
 from bs4 import BeautifulSoup
 from database.db_manager import save_to_database_immo
 import re
+
+from ..base_scraper import BaseScraper
 from .mubawab_lisiting  import Mubawab_listing
-from .mubawab_scraper_location import MubawabLocationScraper
+
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 import time
 from selenium.webdriver.common.by import By
 from utils.utils import Utils
 import json
-class MubawabScraper(BaseScraper):
+class MubawabLocationScraper(BaseScraper):
     def __init__(self):
-        super().__init__("https://www.mubawab.ma/fr/cc/immobilier-a-vendre-all:sc:apartment-sale,commercial-sale,farm-sale,house-sale,land-sale,office-sale,other-sale,riad-sale,villa-sale:p:{}", "page")
+        super().__init__("https://www.mubawab.ma/fr/cc/immobilier-a-louer-all:sc:apartment-rent,commercial-rent,farm-rent,house-rent,land-rent,office-rent,other-rent,riad-rent,room-rent,villa-rent:p:{}", "page")
 
 
     # redifintion de la methode fetch_page
@@ -99,7 +99,7 @@ class MubawabScraper(BaseScraper):
 
                 immobilier = Immobilier(
                     titre=title,
-                    type_transaction="Vente",
+                    type_transaction="Location",
                     prix=price_numeric,
                     url=complete_url,
                     type_de_bien=type_de_bien,
@@ -132,6 +132,4 @@ class MubawabScraper(BaseScraper):
             html = self.fetch_page(url)
             if html:
                 self.parse_page(html)
-        MubawabLocationScraper.scrape()
-        
 
