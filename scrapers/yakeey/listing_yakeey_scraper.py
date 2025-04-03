@@ -24,8 +24,10 @@ def extract_phone_number(page_source):
     scripts = soup.find_all("script")
     adresse = soup.find_all("p", class_="MuiTypography-root MuiTypography-body1 neighborhoodname mui-b2zo6g")
     ville = soup.find_all("p", class_="MuiTypography-root MuiTypography-body1 cityname mui-b2zo6g")
-    
-    print(f"🏠 Adresse: {adresse[0].text.strip() if adresse else 'No Adresse'} ville: {ville[0].text.strip() if ville else 'No Ville'}")
+    desc = soup.find("h1",{'class','MuiTypography-root MuiTypography-h1 mui-1d0gieb'}).text.strip()
+    # print(f"🏠 Adresse: {adresse[0].text.strip() if adresse else 'No Adresse'} ville: {ville[0].text.strip() if ville else 'No Ville'}")
+    # print("++++++")
+    # print(desc)
     adresseClean = adresse[0].text.strip()+" "+ ville[0].text.strip() if adresse else None
     
     latitude, longitude = geocode_address(adresseClean) if adresseClean else (None, None)
@@ -43,7 +45,8 @@ def extract_phone_number(page_source):
         "phone": phone,
         "address": adresseClean,
         "latitude": latitude,
-        "longitude": longitude
+        "longitude": longitude,
+        "description" : desc
         } 
     return None
 

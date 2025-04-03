@@ -107,7 +107,7 @@ class MubawabLocationScraper(BaseScraper):
                     ville=ville,
                     balcon=1,
                     surface_totale_m2=Utils.get_numeric_value(surface),
-                    prix_en_m2=price_en_m2,
+                    prix_en_m2=round(price_en_m2),
                     chambres=Utils.get_numeric_value(chambres),
                     longitude=long if long else 0,
                     latitude=lat if lat else 0,

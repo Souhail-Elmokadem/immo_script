@@ -7,9 +7,9 @@ from database.db_manager import save_to_database_immo
 import re
 from utils.utils import Utils
 from scrapers.yakeey.listing_yakeey_scraper import getinfo_from_listing
-class YakeeyScraper(BaseScraper):
+class YakeeyLocationScraper(BaseScraper):
     def __init__(self):
-        super().__init__("https://yakeey.com/fr-ma/achat/biens/maroc", "page")
+        super().__init__("https://yakeey.com/fr-ma/location/biens/maroc", "page")
 
     def parse_page(self, html):
         baseUrl = "https://yakeey.com"
@@ -104,7 +104,7 @@ class YakeeyScraper(BaseScraper):
                     # developer="",
                     source="Yakeey",
                     type_de_bien=title,
-                    type_transaction="Vente"
+                    type_transaction="Location"
                 )
 
                 save_to_database_immo(immobilier)

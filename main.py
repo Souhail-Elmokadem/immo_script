@@ -1,6 +1,7 @@
 import threading
 from scrapers.avito_immo.avito_immo_scraper import AvitoImmoScraper
 from scrapers.mubawab.mubawab_scraper import MubawabScraper
+from scrapers.yakeey.yakeey_location_scraper import YakeeyLocationScraper
 from scrapers.yakeey.yakeey_scraper import YakeeyScraper
 from scrapers.sarouty.sarouty_scraper import SaroutyScraper
 from scrapers.agenZ.agenz_scraper import AgenZScraper
@@ -37,9 +38,10 @@ if __name__ == "__main__":
 
     scrapers = [
         # AvitoImmoScraper(),
-           MubawabScraper(),
-        # MubawabLocationScraper()
-        # YakeeyScraper(),
+        #    MubawabScraper(),
+         MubawabLocationScraper()
+        #  YakeeyScraper(),
+        # YakeeyLocationScraper(),
         #  SaroutyScraper()
         # AgenZScraper()
     ]
