@@ -12,9 +12,9 @@ import time
 from selenium.webdriver.common.by import By
 from utils.utils import Utils
 import json
-class AgenZScraper(BaseScraper):
+class AgenZLocationScraper(BaseScraper):
     def __init__(self):
-        super().__init__("https://agenz.ma/fr/acheter", "page")
+        super().__init__("https://agenz.ma/fr/louer", "page")
 
     def fetch_page(self, url):
         base_url = "https://agenz.ma"
@@ -113,7 +113,7 @@ class AgenZScraper(BaseScraper):
                     salles_de_bains=Utils.get_numeric_value(salles_de_bains),
                     concierge=1,
                     type_de_bien=type_de_bien,
-                    type_transaction="Vente",
+                    type_transaction="Location",
                     source="Agenz"
                 )
 

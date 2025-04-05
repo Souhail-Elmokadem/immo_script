@@ -10,7 +10,7 @@ def get_listing_info(url):
     }
 
     try:
-        # Fix malformed URL if needed
+        # 🔧 Corriger l'URL si elle est mal formée
         cleaned_url = re.sub(r"https://www\.sarouty\.mahttps:", "https:", url)
 
         response = requests.get(cleaned_url, headers=headers)
@@ -18,25 +18,25 @@ def get_listing_info(url):
         html = response.text
         soup = BeautifulSoup(html, "html.parser")
 
-        # 📞 Extract phone number using regex
+        # 📞 Téléphone
         phone_match = re.search(r'"phone":\{"type":"phone","value":"(\+212\d+)"', html)
         phone = phone_match.group(1) if phone_match else None
 
-        # 🏢 Extract developer / société
+        # 🏢 Développeur
         developer = None
-        societe_tag = soup.find("div", text="Société:")
+        societe_tag = soup.find("div", string="Société:")
         if societe_tag:
             dev_tag = societe_tag.find_next("div", class_="agent-info__detail-content--bold")
             if dev_tag:
                 developer = dev_tag.text.strip()
 
-        # 🌍 Extract latitude & longitude
+        # 🌍 Coordonnées géographiques
         lat_match = re.search(r'"lat":([0-9.]+)', html)
         lon_match = re.search(r'"lon":(-?[0-9.]+)', html)
         latitude = float(lat_match.group(1)) if lat_match else None
         longitude = float(lon_match.group(1)) if lon_match else None
 
-        # 🖼️ (Optional) Extract images (if you want to use it)
+        # 🖼️ Images
         image_urls = []
         for img in soup.find_all("img"):
             src = img.get("src")
@@ -44,14 +44,30 @@ def get_listing_info(url):
                 image_urls.append(src)
         images_string = ",".join(image_urls)
 
+        # 📝 Description (avec fallback si absente)
+        description_div = soup.find("div", class_=re.compile("property-description__text-trim"))
+        if description_div:
+            description = description_div.get_text(separator="\n").strip()
+        else:
+            print(f"⚠️ Aucune description trouvée pour: {url}")
+            description = ""
+
         return {
             "phone": phone,
             "developer": developer,
             "latitude": latitude,
             "longitude": longitude,
-            "images": images_string
+            "images": images_string,
+            "description": description
         }
 
     except requests.RequestException as e:
         print(f"❌ Error fetching listing page: {e}")
-        return None
+        return {
+            "phone": None,
+            "developer": None,
+            "latitude": None,
+            "longitude": None,
+            "images": "",
+            "description": ""
+        }

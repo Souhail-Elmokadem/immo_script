@@ -6,10 +6,10 @@ from scrapers.sarouty.listing_sarouty_scraper import get_listing_info
 from utils.utils import Utils
 import re
 
-class SaroutyScraper(BaseScraper):
+class SaroutyLocationScraper(BaseScraper):
     def __init__(self):
         super().__init__(
-            "https://www.sarouty.ma/acheter/proprietes-a-vendre.html",
+            "https://www.sarouty.ma/louer/proprietes-a-vendre.html",
             "page",
         )
 
@@ -68,7 +68,7 @@ class SaroutyScraper(BaseScraper):
                     latitude=details.get("latitude"),
                     source="sarouty",
                     type_de_bien=type_de_bien,
-                    type_transaction="Vente",
+                    type_transaction="Location",
                     description=details.get("description"),
                 )
 
